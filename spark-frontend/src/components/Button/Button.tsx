@@ -1,17 +1,8 @@
 "use client";
 import React from "react";
+import { IButtonProps } from "./button.types";
 
-interface ButtonProps {
-    children: React.ReactNode;
-    variant?: "primary" | "secondary" | "outline";
-    size?: "sm" | "md" | "lg";
-    onClick?: () => void;
-    disabled?: boolean;
-    className?: string;
-    type?: "button" | "submit" | "reset";
-}
-
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<IButtonProps> = ({
     children,
     variant = "primary",
     size = "md",
@@ -27,9 +18,9 @@ const Button: React.FC<ButtonProps> = ({
         primary:
             "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white font-semibold hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed",
         secondary:
-            "bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500",
+            "inline-flex items-center gap-2 px-6 py-3 bg-[#667eea] hover:bg-[#5a67d8] text-white font-medium rounded-xl transition-colors",
         outline:
-            "flex items-center justify-center gap-2 bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-xl p-3 text-white text-sm transition-all duration-300 hover:bg-[rgba(255,255,255,0.15)]",
+            "flex items-center justify-center gap-2 bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-xl p-3 text-white font-medium  transition-all duration-300 hover:bg-[rgba(255,255,255,0.15)]",
     };
 
     const sizeStyles = {

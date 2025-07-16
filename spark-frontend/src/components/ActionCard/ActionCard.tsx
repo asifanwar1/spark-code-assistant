@@ -3,22 +3,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { StaticImageData } from "next/image";
+import { IActionCardProps } from "./actionCard.types";
 
-interface Feature {
-    text: string;
-    icon?: React.ReactNode;
-}
-
-interface ActionCardProps {
-    title: string;
-    description: string;
-    features: Feature[];
-    icon: string | StaticImageData;
-    href: string;
-    className?: string;
-}
-
-const ActionCard: React.FC<ActionCardProps> = ({
+const ActionCard: React.FC<IActionCardProps> = ({
     title,
     description,
     features,

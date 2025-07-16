@@ -1,33 +1,9 @@
 "use client";
 import React from "react";
 import Image from "next/image";
+import { IFooterProps } from "./footer.types";
 
-interface FooterLink {
-    label: string;
-    href: string;
-}
-
-interface SocialLink {
-    platform: string;
-    href: string;
-    icon: React.ReactNode;
-}
-
-interface FooterProps {
-    companyInfo: {
-        name: string;
-        address?: string;
-        email?: string;
-    };
-    links: {
-        title: string;
-        links: FooterLink[];
-    }[];
-    socialLinks: SocialLink[];
-    className?: string;
-}
-
-const Footer: React.FC<FooterProps> = ({
+const Footer: React.FC<IFooterProps> = ({
     companyInfo,
     links,
     socialLinks,

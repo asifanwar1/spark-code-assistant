@@ -1,13 +1,10 @@
 import React from "react";
 import Link from "next/link";
 
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { ActionCard } from "@/components/ActionCard";
 import { HeroSection } from "@/components/HeroSection";
 import { FeatureCard } from "@/components/FeatureCard";
 
-import { mainNavLinks, footerNavLinks, socialLinks } from "@/constants";
 import dataTransfer from "@/assets/images/data-transfer.png";
 import chat from "@/assets/images/chat.png";
 import analysis from "@/assets/images/analysis.png";
@@ -15,7 +12,7 @@ import intelligence from "@/assets/images/intelligence.png";
 import dataVisualization from "@/assets/images/data-visualization.png";
 import context from "@/assets/images/context.png";
 import compliant from "@/assets/images/compliant.png";
-import avatar from "@/assets/images/user.png";
+
 import team from "@/assets/images/link.png";
 import document from "@/assets/images/document.png";
 import textEditor from "@/assets/images/text-editor.png";
@@ -27,22 +24,8 @@ export const metadata = {
 };
 
 export default function HomePage() {
-    const profileInfo = {
-        name: "John Doe",
-        email: "john@example.com",
-        avatar: avatar,
-    };
-
     return (
         <div className="min-h-screen">
-            <Navbar
-                textLogo={{
-                    text: "Spark",
-                }}
-                links={mainNavLinks}
-                profile={profileInfo}
-            />
-
             <main className="px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
                 <HeroSection
                     title="AI-Powered Code Assistant"
@@ -92,7 +75,7 @@ export default function HomePage() {
                             { text: "Team activity tracking" },
                         ]}
                         icon={team}
-                        href="/analytics"
+                        href="/teams"
                     />
                     <ActionCard
                         title="Code Editor"
@@ -103,7 +86,7 @@ export default function HomePage() {
                             { text: "Instant error detection" },
                         ]}
                         icon={textEditor}
-                        href="/analytics"
+                        href="/spark-code-studio"
                     />
                     <ActionCard
                         title="Documentation"
@@ -114,7 +97,7 @@ export default function HomePage() {
                             { text: "Markdown and rich text support" },
                         ]}
                         icon={document}
-                        href="/analytics"
+                        href="/documentation"
                     />
                 </div>
 
@@ -141,16 +124,6 @@ export default function HomePage() {
                     />
                 </div>
             </main>
-
-            <Footer
-                companyInfo={{
-                    name: "Spark",
-                    address: "123 Tech Street, Silicon Valley, CA 94043",
-                    email: "contact@spark.com",
-                }}
-                links={footerNavLinks}
-                socialLinks={socialLinks}
-            />
         </div>
     );
 }

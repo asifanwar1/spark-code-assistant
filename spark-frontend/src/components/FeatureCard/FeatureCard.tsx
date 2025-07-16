@@ -1,16 +1,9 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { StaticImageData } from "next/image";
+import { IFeatureCardProps } from "./featureCard.types";
 
-interface FeatureCardProps {
-    icon: string | StaticImageData;
-    title: string;
-    description: string;
-    className?: string;
-}
-
-const FeatureCard: React.FC<FeatureCardProps> = ({
+const FeatureCard: React.FC<IFeatureCardProps> = ({
     icon = "/icons/upload.svg",
     title,
     description,

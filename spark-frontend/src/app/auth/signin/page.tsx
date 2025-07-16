@@ -7,18 +7,9 @@ import { Button } from "@/components/Button";
 import Link from "next/link";
 import { signupStats } from "@/constants/Stats";
 import { signinFeatures } from "@/constants/Features";
+import { ISigninFormData } from "../auth.types";
 
-interface SignupFormData {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    terms: boolean;
-    newsletter: boolean;
-}
-
-const SignupSection: React.FC = () => {
+const SignupSection: React.FC<ISigninFormData> = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +19,9 @@ const SignupSection: React.FC = () => {
         handleSubmit,
         formState: { errors },
         watch,
-    } = useForm<SignupFormData>();
+    } = useForm<ISigninFormData>();
 
-    const onSubmit = async (data: SignupFormData) => {
+    const onSubmit = async (data: ISigninFormData) => {
         setIsLoading(true);
         try {
             // Handle form submission
@@ -122,7 +113,7 @@ const SignupSection: React.FC = () => {
                                 <div className="flex items-center gap-3">
                                     <InputField
                                         type="checkbox"
-                                        registration={register("newsletter")}
+                                        registration={register("rememberMe")}
                                         className="w-5 h-5 rounded border-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.1)] text-[#667eea] focus:ring-[#667eea]"
                                     />
 

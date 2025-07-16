@@ -1,18 +1,9 @@
 // src/components/BrandingSection/BrandingSection.tsx
 "use client";
 import React from "react";
-import type { Feature } from "@/constants/Features";
-import type { Stats } from "@/constants/Stats";
+import { IBrandingSectionProps } from "./branding.types";
 
-interface BrandingSectionProps {
-    features: Feature[];
-    stats: Stats[];
-    heading: string;
-    text: string;
-    className?: string;
-}
-
-const BrandingSection: React.FC<BrandingSectionProps> = ({
+const BrandingSection: React.FC<IBrandingSectionProps> = ({
     features = [],
     stats = [],
     heading = "",

@@ -1,15 +1,7 @@
 import React from "react";
+import { IInputFieldProps } from "./input.types";
 
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    label?: string;
-    error?: string;
-    registration?: any; // react-hook-form's register
-    children?: React.ReactNode;
-    className?: string;
-    type: string;
-}
-
-const InputField: React.FC<InputFieldProps> = ({
+const InputField: React.FC<IInputFieldProps> = ({
     label,
     error,
     registration,

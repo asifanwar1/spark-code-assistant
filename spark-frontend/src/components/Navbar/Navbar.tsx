@@ -2,41 +2,9 @@
 import React, { useState, useEffect } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
+import { INavbarProps } from "./navbar.types";
 
-interface NavLink {
-    label: string;
-    href: string;
-    icon?: React.ReactNode;
-}
-
-interface ProfileInfo {
-    name: string;
-    avatar?: string | StaticImageData;
-    email?: string;
-}
-
-interface TextLogo {
-    text: string;
-    className?: string;
-}
-
-interface ImageLogo {
-    src: string;
-    alt: string;
-    width?: number;
-    height?: number;
-}
-
-interface NavbarProps {
-    imageLogo?: ImageLogo;
-    textLogo?: TextLogo;
-    links: NavLink[];
-    profile?: ProfileInfo;
-    onProfileClick?: () => void;
-    className?: string;
-}
-
-const Navbar: React.FC<NavbarProps> = ({
+const Navbar: React.FC<INavbarProps> = ({
     imageLogo,
     textLogo = { text: "Logo", className: "" },
     links,
@@ -75,18 +43,22 @@ const Navbar: React.FC<NavbarProps> = ({
                     {/* Logo */}
                     <div className="flex-shrink-0 flex items-center">
                         {imageLogo ? (
-                            <Image
-                                src={imageLogo.src}
-                                alt={imageLogo.alt}
-                                width={imageLogo.width || 40}
-                                height={imageLogo.height || 40}
-                                className="h-8 w-auto"
-                            />
+                            <Link href="/">
+                                <Image
+                                    src={imageLogo.src}
+                                    alt={imageLogo.alt}
+                                    width={imageLogo.width || 40}
+                                    height={imageLogo.height || 40}
+                                    className="h-8 w-auto"
+                                />
+                            </Link>
                         ) : (
                             <div
-                                className={`text-2xl font-bold bg-gradient-to-br from-indigo-400 to-purple-600 bg-clip-text text-transparent  ${textLogo.className}`}
+                                className={`text-2xl font-bold bg-gradient-to-br from-indigo-400 to-purple-600 bg-clip-text text-transparent transition-transform duration-200 ease-in-out hover:scale-110 ${textLogo.className}`}
                             >
-                                <h4>{textLogo.text}</h4>
+                                <Link href="/">
+                                    <h4>{textLogo.text}</h4>
+                                </Link>
                             </div>
                         )}
                     </div>

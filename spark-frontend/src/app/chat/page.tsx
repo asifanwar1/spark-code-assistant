@@ -1,128 +1,130 @@
-import React from 'react';
+"use client";
+import React, { useRef, useState, useEffect } from "react";
+import { InputField } from "@/components/Input";
+import { Button } from "@/components/Button";
 
-export const metadata = {
-  title: 'Chat | Spark',
-  description: 'Real-time messaging and collaboration',
+interface Message {
+    id: number;
+    sender: "user" | "ai";
+    text: string;
+}
+
+const ChatPage: React.FC = () => {
+    const [messages, setMessages] = useState<Message[]>([
+        {
+            id: 1,
+            sender: "ai",
+            text: "Hello! I'm your AI coding assistant. How can I help you today?",
+        },
+    ]);
+    const [input, setInput] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Scroll to bottom when messages change
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
+    const handleSend = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (!input.trim()) return;
+
+        const userMessage: Message = {
+            id: Date.now(),
+            sender: "user",
+            text: input,
+        };
+
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        setIsLoading(true);
+
+        // Simulate AI response (replace with real API call)
+        setTimeout(() => {
+            setMessages((prev) => [
+                ...prev,
+                {
+                    id: Date.now() + 1,
+                    sender: "ai",
+                    text: `You said: "${userMessage.text}"\n\n(Here would be the AI's helpful coding response!)`,
+                },
+            ]);
+            setIsLoading(false);
+        }, 1200);
+    };
+
+    return (
+        <div className="flex flex-col h-screen bg-gradient-to-br from-[#0a0a0a] via-[#111111] to-[#1a1a1a]">
+            {/* Header */}
+            <div className="p-4 border-b border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)]">
+                <h1 className="text-2xl font-bold bg-gradient-to-br from-white to-[#a0a0a0] bg-clip-text text-transparent">
+                    AI Coding Assistant
+                </h1>
+                <p className="text-[#a0a0a0] text-sm">
+                    Chat with your AI assistant for coding help and suggestions.
+                </p>
+            </div>
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto px-2 md:px-8 py-4 space-y-4">
+                {messages.map((msg) => (
+                    <div
+                        key={msg.id}
+                        className={`flex ${
+                            msg.sender === "user"
+                                ? "justify-end"
+                                : "justify-start"
+                        }`}
+                    >
+                        <div
+                            className={`max-w-[80%] md:max-w-[60%] px-4 py-3 rounded-2xl shadow ${
+                                msg.sender === "user"
+                                    ? "bg-[#667eea] text-white rounded-br-none"
+                                    : "bg-[rgba(255,255,255,0.08)] text-[#e0e0e0] rounded-bl-none"
+                            } whitespace-pre-line`}
+                        >
+                            {msg.text}
+                        </div>
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <form
+                onSubmit={handleSend}
+                className="w-full p-4 border-t border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] flex gap-2"
+            >
+                <div className="flex-1">
+                    <InputField
+                        type="text"
+                        placeholder="Type your message..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                                handleSend(e);
+                            }
+                        }}
+                        className="w-full bg-[rgba(255,255,255,0.1)] border border-[rgba(255,255,255,0.2)] rounded-xl p-4 text-white text-base outline-none transition-all duration-300 focus:border-[#667eea] focus:bg-[rgba(255,255,255,0.15)]"
+                        disabled={isLoading}
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    disabled={isLoading || !input.trim()}
+                    className="h-14 mt-auto"
+                >
+                    {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                        "Send"
+                    )}
+                </Button>
+            </form>
+        </div>
+    );
 };
 
-export default function ChatPage() {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Chat</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Connect and collaborate with your team
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="grid grid-cols-12 h-[600px]">
-            {/* Sidebar */}
-            <div className="col-span-3 border-r border-gray-200">
-              {/* Search */}
-              <div className="p-4 border-b border-gray-200">
-                <input
-                  type="text"
-                  placeholder="Search conversations..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Chat List */}
-              <div className="overflow-y-auto h-[calc(600px-73px)]">
-                {/* Chat Item */}
-                <div className="p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <span className="text-blue-600 font-medium">JD</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">John Doe</p>
-                      <p className="text-sm text-gray-500 truncate">
-                        Latest updates on Project Alpha...
-                      </p>
-                    </div>
-                    <div className="text-xs text-gray-500">2m ago</div>
-                  </div>
-                </div>
-
-                {/* Chat Item */}
-                <div className="p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                      <span className="text-green-600 font-medium">AS</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">Alice Smith</p>
-                      <p className="text-sm text-gray-500 truncate">
-                        Can we schedule a meeting?
-                      </p>
-                    </div>
-                    <div className="text-xs text-gray-500">5m ago</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Chat Area */}
-            <div className="col-span-9 flex flex-col">
-              {/* Chat Header */}
-              <div className="p-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">John Doe</h2>
-                <p className="text-sm text-gray-500">Online</p>
-              </div>
-
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Message */}
-                <div className="flex items-start space-x-3">
-                  <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-blue-600 text-sm font-medium">JD</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="bg-gray-100 rounded-lg p-3">
-                      <p className="text-sm text-gray-900">
-                        Hi! How's the project coming along?
-                      </p>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">2:30 PM</p>
-                  </div>
-                </div>
-
-                {/* Message */}
-                <div className="flex items-start space-x-3 justify-end">
-                  <div className="flex-1">
-                    <div className="bg-blue-600 rounded-lg p-3">
-                      <p className="text-sm text-white">
-                        Going well! We've completed 75% of the tasks.
-                      </p>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1 text-right">2:32 PM</p>
-                  </div>
-                  <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <span className="text-green-600 text-sm font-medium">Me</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Message Input */}
-              <div className="p-4 border-t border-gray-200">
-                <div className="flex space-x-4">
-                  <input
-                    type="text"
-                    placeholder="Type a message..."
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    Send
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-} 
+export default ChatPage;

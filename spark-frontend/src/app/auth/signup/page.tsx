@@ -9,18 +9,9 @@ import { Button } from "@/components/Button";
 import Link from "next/link";
 import { signupFeatures } from "@/constants/Features";
 import { signupStats } from "@/constants/Stats";
+import { ISignupFormData } from "../auth.types";
 
-interface SignupFormData {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    terms: boolean;
-    newsletter: boolean;
-}
-
-const SignupSection: React.FC = () => {
+const SignupSection: React.FC<ISignupFormData> = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -30,9 +21,9 @@ const SignupSection: React.FC = () => {
         handleSubmit,
         formState: { errors },
         watch,
-    } = useForm<SignupFormData>();
+    } = useForm<ISignupFormData>();
 
-    const onSubmit = async (data: SignupFormData) => {
+    const onSubmit = async (data: ISignupFormData) => {
         setIsLoading(true);
         try {
             // Handle form submission

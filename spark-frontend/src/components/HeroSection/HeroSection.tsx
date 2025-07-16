@@ -1,13 +1,8 @@
 "use client";
 import React from "react";
+import { IHeroSectionProps } from "./heroSection.types";
 
-interface HeroSectionProps {
-    title?: string;
-    subtitle?: string;
-    className?: string;
-}
-
-const HeroSection: React.FC<HeroSectionProps> = ({
+const HeroSection: React.FC<IHeroSectionProps> = ({
     title = "AI-Powered Code Assistant",
     subtitle = "Upload your entire codebase, analyze UI screenshots, and get intelligent solutions that match your coding standards",
     className = "",
