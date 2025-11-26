@@ -1,18 +1,52 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
+
 import { INavbarProps } from "./navbar.types";
+import { useStore } from "@/store/store";
+import Modal from "../Modal/Modal";
+import { useRouter } from "next/navigation";
+import { createProfileItems } from "@/constants/Profile";
+import { Dropdown } from "../DropDown";
+import logoutIcon from "@/assets/icons/signout-icon-white.svg";
+import { APP_ROUTES } from "@/constants/Routes";
+import { useApiMutation } from "@/hooks/useApiMutation";
+import { TLogoutRequest } from "@/api/services/auth/auth.request.types";
+import { authService } from "@/api/services/auth";
 
 const Navbar: React.FC<INavbarProps> = ({
     imageLogo,
     textLogo = { text: "Logo", className: "" },
     links,
-    profile,
-    onProfileClick,
     className = "",
 }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const user = useStore((state) => state.user);
+    const isAuthenticated = useStore((state) => state.isAuthenticated);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const router = useRouter();
+
+    const logoutMutation = useApiMutation({
+        mutationFn: (data: TLogoutRequest) =>
+            authService.logout({ body: data }),
+        successMessage: "Logged out successfully!",
+        errorMessage: "Failed to logout. Please try again.",
+        onSuccess: () => {
+            router.push(APP_ROUTES.SIGNIN);
+            useStore.getState().clearAuth();
+        },
+    });
+
+    const displayProfile =
+        isAuthenticated && user
+            ? {
+                  name: user.name,
+                  email: user.email,
+                  avatar: user.avatar,
+              }
+            : null;
+
+    const profileItems = createProfileItems(router, setIsModalOpen);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -34,205 +68,274 @@ const Navbar: React.FC<INavbarProps> = ({
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const handleLogout = () => {
+        logoutMutation.mutate({});
+        setIsModalOpen(false);
+    };
+
     return (
-        <nav
-            className={`bg-[rgba(17,17,17,0.8)] backdrop-blur-[20px] border-b border-white/10 py-4 ${className} relative`}
-        >
-            <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-                <div className="flex justify-between h-16">
-                    {/* Logo */}
-                    <div className="flex-shrink-0 flex items-center">
-                        {imageLogo ? (
-                            <Link href="/">
-                                <Image
-                                    src={imageLogo.src}
-                                    alt={imageLogo.alt}
-                                    width={imageLogo.width || 40}
-                                    height={imageLogo.height || 40}
-                                    className="h-8 w-auto"
-                                />
-                            </Link>
-                        ) : (
-                            <div
-                                className={`text-2xl font-bold bg-gradient-to-br from-indigo-400 to-purple-600 bg-clip-text text-transparent transition-transform duration-200 ease-in-out hover:scale-110 ${textLogo.className}`}
-                            >
+        <>
+            <nav
+                className={`bg-[rgba(17,17,17,0.8)] backdrop-blur-[20px] border-b border-white/10 py-4 ${className} relative`}
+            >
+                <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+                    <div className="flex justify-between h-16">
+                        <div className="flex-shrink-0 flex items-center">
+                            {imageLogo ? (
                                 <Link href="/">
-                                    <h4>{textLogo.text}</h4>
+                                    <img
+                                        src={imageLogo.src}
+                                        alt={imageLogo.alt}
+                                        width={imageLogo.width || 40}
+                                        height={imageLogo.height || 40}
+                                        className="h-8 w-auto"
+                                    />
+                                </Link>
+                            ) : (
+                                <div
+                                    className={`text-2xl font-bold bg-gradient-to-br from-indigo-400 to-purple-600 bg-clip-text text-transparent transition-transform duration-200 ease-in-out hover:scale-110 ${textLogo.className}`}
+                                >
+                                    <Link href="/">
+                                        <h4>{textLogo.text}</h4>
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                        {isAuthenticated && (
+                            <div className="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                                {links.map((link, index) => (
+                                    <Link
+                                        key={index}
+                                        href={link.href}
+                                        className="text-white hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                                    >
+                                        {link.icon && (
+                                            <span className="mr-2">
+                                                {link.icon}
+                                            </span>
+                                        )}
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+
+                        {displayProfile && (
+                            <div className="hidden md:ml-6 md:flex md:items-center ">
+                                <Dropdown
+                                    trigger={
+                                        <button className="flex items-center space-x-3 focus:outline-none cursor-pointer">
+                                            {displayProfile.avatar ? (
+                                                <img
+                                                    src={displayProfile.avatar}
+                                                    alt={displayProfile.name}
+                                                    width={32}
+                                                    height={32}
+                                                    className="rounded-full"
+                                                />
+                                            ) : (
+                                                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                                    <span className="text-gray-600 text-sm">
+                                                        {displayProfile.name
+                                                            .charAt(0)
+                                                            .toUpperCase()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="text-left">
+                                                <p className="text-sm font-medium text-white">
+                                                    {displayProfile.name}
+                                                </p>
+                                                {displayProfile.email && (
+                                                    <p className="text-xs text-white">
+                                                        {displayProfile.email}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <svg
+                                                className="w-4 h-4 text-white"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </button>
+                                    }
+                                    menuContainerClass="!bg-[rgba(255,255,255,0.05)] !backdrop-blur-[80px] !border-[rgba(255,255,255,0.1)]"
+                                    items={profileItems}
+                                    position="bottom-right"
+                                />
+                            </div>
+                        )}
+
+                        {!isAuthenticated && (
+                            <div className="hidden md:ml-6 md:flex md:items-center">
+                                <Link
+                                    href={APP_ROUTES.SIGNIN}
+                                    className="text-white hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                                >
+                                    Login
                                 </Link>
                             </div>
                         )}
-                    </div>
 
-                    {/* Desktop Navigation Links */}
-                    <div className="hidden md:ml-6 md:flex md:items-center md:space-x-8">
-                        {links.map((link, index) => (
-                            <Link
-                                key={index}
-                                href={link.href}
-                                className="text-white hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium flex items-center"
-                            >
-                                {link.icon && (
-                                    <span className="mr-2">{link.icon}</span>
-                                )}
-                                {link.label}
-                            </Link>
-                        ))}
-                    </div>
-
-                    {/* Profile Section */}
-                    {profile && (
-                        <div className="hidden md:ml-6 md:flex md:items-center">
+                        <div className="flex items-center md:hidden">
                             <button
-                                onClick={onProfileClick}
-                                className="flex items-center space-x-3 focus:outline-none"
+                                id="mobile-menu-button"
+                                onClick={() =>
+                                    setIsMobileMenuOpen(!isMobileMenuOpen)
+                                }
+                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
                             >
-                                {profile.avatar ? (
-                                    <Image
-                                        src={profile.avatar}
-                                        alt={profile.name}
-                                        width={32}
-                                        height={32}
-                                        className="rounded-full"
+                                <span className="sr-only">Open main menu</span>
+                                <svg
+                                    className={`${
+                                        isMobileMenuOpen ? "hidden" : "block"
+                                    } h-6 w-6`}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M4 6h16M4 12h16M4 18h16"
                                     />
-                                ) : (
-                                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                        <span className="text-gray-600 text-sm">
-                                            {profile.name
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="text-left">
-                                    <p className="text-sm font-medium text-white">
-                                        {profile.name}
-                                    </p>
-                                    {profile.email && (
-                                        <p className="text-xs text-white">
-                                            {profile.email}
-                                        </p>
-                                    )}
-                                </div>
+                                </svg>
+                                <svg
+                                    className={`${
+                                        isMobileMenuOpen ? "block" : "hidden"
+                                    } h-6 w-6`}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
                             </button>
                         </div>
-                    )}
-
-                    {/* Mobile menu button */}
-                    <div className="flex items-center md:hidden">
-                        <button
-                            id="mobile-menu-button"
-                            onClick={() =>
-                                setIsMobileMenuOpen(!isMobileMenuOpen)
-                            }
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-                        >
-                            <span className="sr-only">Open main menu</span>
-                            {/* Hamburger icon */}
-                            <svg
-                                className={`${
-                                    isMobileMenuOpen ? "hidden" : "block"
-                                } h-6 w-6`}
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                            </svg>
-                            {/* Close icon */}
-                            <svg
-                                className={`${
-                                    isMobileMenuOpen ? "block" : "hidden"
-                                } h-6 w-6`}
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
                     </div>
                 </div>
-            </div>
 
-            {/* Mobile menu */}
-            <div
-                // className={`${isMobileMenuOpen ? "block" : "hidden"} sm:hidden`}
-                id="mobile-menu"
-                className={`
-                  fixed left-0 right-0  // Changed from absolute to fixed
-                  transform transition-all duration-300 ease-in-out
-                  ${
-                      isMobileMenuOpen
-                          ? "opacity-200 visible"
-                          : "opacity-0 invisible"
-                  }
-                  md:hidden
+                <div
+                    id="mobile-menu"
+                    className={`
+                    fixed left-0 right-0  // Changed from absolute to fixed
+                    transform transition-all duration-300 ease-in-out
+                    ${
+                        isMobileMenuOpen
+                            ? "opacity-200 visible"
+                            : "opacity-0 invisible"
+                    }
+                    md:hidden
                   bg-[rgba(17,17,17,0.95)] backdrop-blur-[20px]
                   border-b border-white/10
                   z-50
                   w-full  // Added explicit width
                   overflow-x-hidden  // Prevent horizontal scroll
               `}
-            >
-                <div className="pt-2 pb-3 px-4 space-y-2">
-                    {links.map((link, index) => (
-                        <Link
-                            key={index}
-                            href={link.href}
-                            className="text-white hover:text-indigo-400 block px-3 py-2 rounded-md text-base font-medium flex items-center"
-                        >
-                            {link.icon && (
-                                <span className="mr-2">{link.icon}</span>
-                            )}
-                            {link.label}
-                        </Link>
-                    ))}
-                </div>
-                {profile && (
-                    <div className="pt-4 pb-3 px-3 border-t border-gray-200">
-                        <div className="flex items-center px-4">
-                            {profile.avatar ? (
-                                <Image
-                                    src={profile.avatar}
-                                    alt={profile.name}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full"
-                                />
-                            ) : (
-                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <span className="text-gray-600">
-                                        {profile.name.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-                            )}
-                            <div className="ml-3">
-                                <p className="text-base font-medium text-white">
-                                    {profile.name}
-                                </p>
-                                {profile.email && (
-                                    <p className="text-sm font-medium text-white">
-                                        {profile.email}
-                                    </p>
+                >
+                    {isAuthenticated && (
+                        <div className="pt-2 pb-3 px-4 space-y-2">
+                            {links.map((link, index) => (
+                                <Link
+                                    key={index}
+                                    href={link.href}
+                                    className="text-white hover:text-indigo-400 block px-3 py-2 rounded-md text-base font-medium flex items-center"
+                                >
+                                    {link.icon && (
+                                        <span className="mr-2">
+                                            {link.icon}
+                                        </span>
+                                    )}
+                                    {link.label}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+
+                    {!isAuthenticated && (
+                        <div className="hidden md:ml-6 md:flex md:items-center">
+                            <Link
+                                href={APP_ROUTES.SIGNIN}
+                                className="text-white hover:text-indigo-400 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                            >
+                                Login
+                            </Link>
+                        </div>
+                    )}
+
+                    {displayProfile && (
+                        <div className="pt-4 pb-3 px-3 border-t border-gray-200">
+                            <div className="flex items-center px-4">
+                                {displayProfile.avatar ? (
+                                    <img
+                                        src={displayProfile.avatar}
+                                        alt={displayProfile.name}
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full"
+                                    />
+                                ) : (
+                                    <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <span className="text-gray-600">
+                                            {displayProfile.name
+                                                .charAt(0)
+                                                .toUpperCase()}
+                                        </span>
+                                    </div>
                                 )}
+                                <div className="ml-3">
+                                    <p className="text-base font-medium text-white">
+                                        {displayProfile.name}
+                                    </p>
+                                    {displayProfile.email && (
+                                        <p className="text-sm font-medium text-white">
+                                            {displayProfile.email}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>
-        </nav>
+                    )}
+                </div>
+            </nav>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Logout"
+                description="Are you sure you want to logout?"
+                descriptionIcon={logoutIcon}
+                descriptionIconClass="w-10 h-10 mx-auto"
+                mainContainerClass="!border !border-[rgba(255,255,255,0.1)]"
+                size="sm"
+                primaryButton={{
+                    label: "Logout",
+                    onClick: () => {
+                        handleLogout();
+                    },
+                }}
+                secondaryButton={{
+                    label: "Cancel",
+                    onClick: () => {
+                        setIsModalOpen(false);
+                    },
+                }}
+            />
+        </>
     );
 };
 

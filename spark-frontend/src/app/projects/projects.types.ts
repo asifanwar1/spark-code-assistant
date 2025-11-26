@@ -29,3 +29,49 @@ export interface IProjectUploadFormData {
     description: string;
     selectedFramework: string;
 }
+
+export interface IGithubConnectionStatus {
+    isConnected: boolean;
+    username?: string;
+    avatarUrl?: string;
+}
+
+export interface IGithubRepository {
+    id: number;
+    name: string;
+    fullName: string;
+    description: string | null;
+    private: boolean;
+    language: string | null;
+    stars: number;
+    forks: number;
+    updatedAt: string;
+    defaultBranch: string;
+}
+
+export interface IGithubRepositoriesResponse {
+    success: boolean;
+    message: string;
+    data: {
+        repositories: IGithubRepository[];
+    };
+    timestamp: string;
+}
+
+export interface IGithubConnectionResponse {
+    success: boolean;
+    message: string;
+    data: {
+        isConnected: boolean;
+        username?: string;
+        avatarUrl?: string;
+        authUrl?: string;
+    };
+    timestamp: string;
+}
+
+export interface IImportGithubProjectRequest {
+    repositoryId: number;
+    repositoryName: string;
+    repositoryFullName: string;
+}

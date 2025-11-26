@@ -18,7 +18,7 @@ const ProjectDetails: React.FC<IProjectDetailsFormProps> = ({
                     Project Details
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                     <InputField
                         label="Project Name *"
                         type="text"
@@ -28,12 +28,12 @@ const ProjectDetails: React.FC<IProjectDetailsFormProps> = ({
                         })}
                         // error={errors}
                     />
-                    <SelectField
+                    {/* <SelectField
                         label="Framework"
                         options={frameworks}
                         registration={register("selectedFramework")}
                         // error={errors}
-                    />
+                    /> */}
 
                     <div className="md:col-span-2 space-y-2">
                         <TextArea

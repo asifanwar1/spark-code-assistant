@@ -11,4 +11,5 @@ export interface ISignupFormData {
 export interface ISigninFormData {
     email: string;
     password: string;
+    rememberMe?: boolean;
 }

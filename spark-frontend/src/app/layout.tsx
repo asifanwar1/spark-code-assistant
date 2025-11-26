@@ -7,6 +7,9 @@ import { mainNavLinks } from "@/constants/NavLinks";
 import { Footer } from "@/components/Footer";
 import { footerNavLinks } from "@/constants/FooterLinks";
 import { socialLinks } from "@/constants/SocialLinks";
+import ApiClientProvider from "@/providers/ApiClientProvider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -38,23 +41,38 @@ export default function RootLayout({
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <Navbar
-                    textLogo={{
-                        text: "Spark",
-                    }}
-                    links={mainNavLinks}
-                    profile={profileInfo}
-                />
-                {children}
-                <Footer
-                    companyInfo={{
-                        name: "Spark",
-                        address: "123 Tech Street, Silicon Valley, CA 94043",
-                        email: "contact@spark.com",
-                    }}
-                    links={footerNavLinks}
-                    socialLinks={socialLinks}
-                />
+                <ApiClientProvider>
+                    <Navbar
+                        textLogo={{
+                            text: "Spark",
+                        }}
+                        links={mainNavLinks}
+                        // profile={profileInfo}
+                    />
+                    {children}
+                    <Footer
+                        companyInfo={{
+                            name: "Spark",
+                            address:
+                                "123 Tech Street, Silicon Valley, CA 94043",
+                            email: "contact@spark.com",
+                        }}
+                        links={footerNavLinks}
+                        socialLinks={socialLinks}
+                    />
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="light"
+                    />
+                </ApiClientProvider>
             </body>
         </html>
     );

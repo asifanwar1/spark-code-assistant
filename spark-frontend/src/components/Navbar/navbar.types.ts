@@ -6,12 +6,6 @@ export interface INavLink {
     icon?: React.ReactNode;
 }
 
-export interface IProfileInfo {
-    name: string;
-    avatar?: string | StaticImageData;
-    email?: string;
-}
-
 export interface ITextLogo {
     text: string;
     className?: string;
@@ -28,7 +22,5 @@ export interface INavbarProps {
     imageLogo?: IImageLogo;
     textLogo?: ITextLogo;
     links: INavLink[];
-    profile?: IProfileInfo;
-    onProfileClick?: () => void;
     className?: string;
 }

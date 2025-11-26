@@ -1,38 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { BrandingSection } from "@/components/Branding";
-import { useForm } from "react-hook-form";
 import { InputField } from "@/components/Input";
 import { Button } from "@/components/Button";
 import Link from "next/link";
 import { signupStats } from "@/constants/Stats";
 import { signinFeatures } from "@/constants/Features";
 import { ISigninFormData } from "../auth.types";
+import { useSigninContainer } from "./signin.container";
 
-const SignupSection: React.FC<ISigninFormData> = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-
+const SigninSection: React.FC<ISigninFormData> = () => {
     const {
+        errors,
+        isLoading,
+        showPassword,
         register,
         handleSubmit,
-        formState: { errors },
-        watch,
-    } = useForm<ISigninFormData>();
-
-    const onSubmit = async (data: ISigninFormData) => {
-        setIsLoading(true);
-        try {
-            // Handle form submission
-            console.log(data);
-            // Add your API call here
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        onSubmit,
+        togglePasswordVisibility,
+    } = useSigninContainer();
 
     return (
         <section className="py-10">
@@ -46,10 +32,8 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                 />
                 <div className="animate-fade-in">
                     <div className="bg-[rgba(255,255,255,0.05)] backdrop-blur-[20px] border border-[rgba(255,255,255,0.1)] rounded-3xl p-8 md:p-12 relative overflow-hidden max-w-[480px] mx-auto">
-                        {/* Gradient line animation */}
                         <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#667eea] via-[#764ba2] to-[#22c55e] animate-shimmer" />
 
-                        {/* Header */}
                         <div className="text-center mb-10">
                             <h2 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-br from-white to-[#a0a0a0] bg-clip-text text-transparent">
                                 Sign In
@@ -59,44 +43,33 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                             </p>
                         </div>
 
-                        {/* Form */}
                         <form
                             onSubmit={handleSubmit(onSubmit)}
                             className="space-y-6"
                         >
-                            {/* Email Field */}
                             <div className="space-y-2">
                                 <InputField
                                     label="Email Address"
                                     placeholder="Enter your email"
                                     type="email"
-                                    registration={register("email", {
-                                        required: "Email is required",
-                                        pattern: {
-                                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                            message: "Invalid email address",
-                                        },
-                                    })}
+                                    registration={register("email")}
                                     error={errors.email?.message}
                                 />
                             </div>
 
-                            {/* Password Fields */}
                             <div className="space-y-2">
                                 <InputField
                                     label="Password"
                                     placeholder="Enter your password"
                                     type={showPassword ? "text" : "password"}
-                                    registration={register("password", {
-                                        required: "Password is required",
-                                    })}
+                                    registration={register("password")}
                                     error={errors.password?.message}
                                     autoComplete="new-password"
                                 >
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            setShowPassword((prev) => !prev)
+                                            togglePasswordVisibility()
                                         }
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a0a0a0] hover:text-[#667eea] transition-colors"
                                         tabIndex={-1}
@@ -106,14 +79,12 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                                 </InputField>
                             </div>
 
-                            {/* Confirm Password Field */}
-
-                            {/* Checkboxes */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
                                     <InputField
                                         type="checkbox"
                                         registration={register("rememberMe")}
+                                        error={errors.rememberMe?.message}
                                         className="w-5 h-5 rounded border-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.1)] text-[#667eea] focus:ring-[#667eea]"
                                     />
 
@@ -123,7 +94,6 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
                             <Button
                                 type="submit"
                                 disabled={isLoading}
@@ -140,7 +110,6 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                             </Button>
                         </form>
 
-                        {/* Divider */}
                         <div className="flex items-center gap-4 my-8">
                             <div className="flex-1 h-px bg-[rgba(255,255,255,0.2)]" />
                             <span className="text-[#a0a0a0] text-sm">
@@ -149,10 +118,9 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                             <div className="flex-1 h-px bg-[rgba(255,255,255,0.2)]" />
                         </div>
 
-                        {/* Social Buttons */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <Button
-                                type="submit"
+                                type="button"
                                 disabled={isLoading}
                                 size="lg"
                                 variant="outline"
@@ -160,7 +128,7 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                                 Google
                             </Button>
                             <Button
-                                type="submit"
+                                type="button"
                                 disabled={isLoading}
                                 size="lg"
                                 variant="outline"
@@ -169,7 +137,6 @@ const SignupSection: React.FC<ISigninFormData> = () => {
                             </Button>
                         </div>
 
-                        {/* Login Link */}
                         <div className="text-center mt-8 text-[#a0a0a0] text-sm">
                             Don't have an account?{" "}
                             <Link
@@ -186,4 +153,4 @@ const SignupSection: React.FC<ISigninFormData> = () => {
     );
 };
 
-export default SignupSection;
+export default SigninSection;
